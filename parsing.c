@@ -37,6 +37,18 @@ long eval_op(long x, char* operator, long y) {
     if(strcmp(operator, "^") == 0) {
         return pow(x, y);
     }
+    if(strcmp(operator, "min") == 0) {
+        if (x < y) {
+            return x;
+        }
+        return y;
+    }
+    if(strcmp(operator, "max") == 0) {
+        if (x > y) {
+            return x;
+        }
+        return y;
+    }
     return 0;
 }
 
@@ -68,7 +80,7 @@ int main(int argc, char** argv) {
     mpca_lang(MPCA_LANG_DEFAULT,
         "\
             number      : /-?[0-9]+\\.?[0-9]*/ ; \
-            operator    : '+' | '-' | '*' | '/' | '*' | '%' | '^' ; \
+            operator    : '+' | '-' | '*' | '/' | '*' | '%' | '^' | \"min\" | \"max\"  ; \
             expr        : <number> | '(' <operator> <expr>+ ')' ; \
             byol        : /^/ <operator> <expr>+ /$/ ; \
         ", Number, Operator, Expr, Byol);
