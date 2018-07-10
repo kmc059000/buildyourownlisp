@@ -52,6 +52,14 @@ long eval_op(long x, char* operator, long y) {
     return 0;
 }
 
+long eval_op_single_expr(long x, char* operator) {
+    if(strcmp(operator, "-") == 0) {
+        return -x;
+    }
+
+    return x;
+}
+
 long eval(mpc_ast_t* t) {
     if (strstr(t->tag, "number")) {
         return atoi(t->contents);
@@ -66,6 +74,11 @@ long eval(mpc_ast_t* t) {
         long childrenValue = eval(t->children[i]);
         x = eval_op(x, operator, childrenValue);
         i++;
+    }
+
+    //if only one number/expr in this expr, then apply operator to single value as necessary
+    if (i == 3) {
+        x = eval_op_single_expr(x, operator);
     }
 
     return x;
