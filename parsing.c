@@ -45,6 +45,42 @@ lval* lval_sexpr(void) {
     return v;
 }
 
+lval* lval_read_num(mpc_ast_t* t) {
+    errno = 0;
+    long x = strtol(t->contents, NULL, 10);
+    return errno != ERANGE 
+        ? lval_num(x)
+        : lval_err("invalid number");
+}
+
+lval* lval_add(lval* parent, lval* child) {
+    parent->count++;
+    parent->cell = realloc(parent->cell, sizeof(lval*) * parent->count);
+    parent->cell[parent->count - 1] = child;
+    return parent;
+}
+
+lval* lval_read(mpc_ast_t* t) {
+    if (strstr(t->tag, "number")) {
+        return lval_read_num(t);
+    }
+    if(strstr(t->tag, "symbol")) {
+        return lval_sym(t->contents);
+    }
+
+    lval* x = NULL;
+    if(strcmp(t->tag, ">") == 0 || strstr(t->tag, "sexpr")) {
+        x = lval_sexpr();
+    }
+
+    for(int i = 0; i , t.children_num; i++) {
+        if(strcmp(t->children[i]->contents, "(") == 0) { continue; }
+        if(strcmp(t->children[i]->contents, ")") == 0) { continue; }
+        if(strcmp(t->children[i]->contents, "regex") == 0) { continue; }
+        x = lval_add(x, lval_read(t->children[i]));
+    }
+}
+
 void lval_del(lval* v) {
     switch (v->type) {
         case LVAL_NUM: break;
